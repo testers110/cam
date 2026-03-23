@@ -1,93 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Best online offers and deals - Updated daily">
-    <title>Top Deals & Offers 2026</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-        
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: #0f0f0f;
-            color: #fff;
-            line-height: 1.6;
-        }
-        header {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 20px;
-            text-align: center;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: 600;
-            margin: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 2.8rem;
-            margin-bottom: 20px;
-        }
-        .embed-wrapper {
-            background: #1a1a2e;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            margin: 30px auto;
-            max-width: 1000px;
-        }
-        iframe {
-            width: 100%;
-            height: 720px;
-            border: none;
-            border-radius: 12px;
-        }
-        .footer {
-            text-align: center;
-            padding: 40px 20px;
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-        @media (max-width: 768px) {
-            iframe { height: 620px; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Models Online Now</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Browse live cam models online right now. Updated in real-time with embedded streams.">
+  <meta name="keywords" content="live cams, cam models, online now, streaming, adult cams">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Live Models Online Now">
+  <meta property="og:description" content="See who's live right now. Updated automatically.">
+  <meta property="og:type" content="website">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: #111;
+      border-bottom: 1px solid #222;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+      padding: 15px;
+    }
+
+    .card {
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.02);
+    }
+
+    iframe {
+      width: 100%;
+      height: 200px;
+      border: none;
+    }
+
+    .info {
+      padding: 10px;
+    }
+
+    .username {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .viewers {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .load-more {
+      text-align: center;
+      padding: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #ff3366;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1 class="logo">🔥 Top Deals & Offers</h1>
-    </header>
 
-    <div class="container">
-        <h1>Exclusive Online Offers – Updated Live</h1>
-        <p style="text-align:center; font-size:1.2rem; max-width:800px; margin:0 auto 40px;">
-            Click below to browse the hottest deals right now. New offers added every hour.
-        </p>
+<header>
+  <h1>🔥 Live Models Online Now</h1>
+</header>
 
-        <!-- === YOUR MONETIZED EMBED === -->
-        <div class="embed-wrapper">
-            <iframe 
-                src="https://feed..com/api/v1/browse/online_embed?id=bewse2&cmp=YOURCODE123" 
-                title="Live Offers"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <!-- === END OF EMBED === -->
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="load-more">
+    <button onclick="loadMore()">Load More</button>
+  </div>
+</main>
 
-        <div style="text-align:center; margin-top:40px;">
-            <p>Share this page and earn more every time someone clicks or signs up!</p>
-        </div>
-    </div>
+<script>
+  const API_URL = "https://feed..com/api/v1/browse/online_embed?id=bewse2&cmp=CMP_HERE";
 
-    <div class="footer">
-        &copy; 2026 Top Deals • All rights reserved • <a href="#" style="color:#fff;">Privacy</a>
-    </div>
+  let rooms = [];
+  let index = 0;
+  const batchSize = 12;
+
+  async function fetchRooms() {
+    try {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      rooms = data.results || data.rooms || [];
+      renderRooms();
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  }
+
+  function createCard(room) {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    const iframe = document.createElement("iframe");
+    iframe.src = room.embed || room.iframe || "";
+
+    const info = document.createElement("div");
+    info.className = "info";
+
+    const username = document.createElement("div");
+    username.className = "username";
+    username.textContent = room.username || "Live Model";
+
+    const viewers = document.createElement("div");
+    viewers.className = "viewers";
+    viewers.textContent = (room.num_users || 0) + " viewers";
+
+    info.appendChild(username);
+    info.appendChild(viewers);
+
+    div.appendChild(iframe);
+    div.appendChild(info);
+
+    return div;
+  }
+
+  function renderRooms() {
+    const grid = document.getElementById("grid");
+
+    for (let i = index; i < index + batchSize && i < rooms.length; i++) {
+      grid.appendChild(createCard(rooms[i]));
+    }
+
+    index += batchSize;
+  }
+
+  function loadMore() {
+    renderRooms();
+  }
+
+  // Initial load
+  fetchRooms();
+</script>
+
 </body>
 </html>
