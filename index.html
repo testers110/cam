@@ -32,6 +32,15 @@
             gap: 12px;
         }
         .count-badge { background: #1e1f2a; padding: 6px 14px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; }
+        .mode-selector {
+            background: #2d2f3e;
+            border: none;
+            color: #eef2ff;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
         .refresh-btn, .debug-toggle {
             background: #2d2f3e;
             border: none;
@@ -91,9 +100,11 @@
     <div class="toolbar">
         <div class="count-badge" id="streamCount">— streams found</div>
         <div>
-            <label style="margin-right: 16px; font-size: 0.8rem;">
-                <input type="checkbox" id="includeLatinaTag"> Include #latina tag (may show non‑LATAM)
-            </label>
+            <select id="modeSelect" class="mode-selector">
+                <option value="strict">🎯 Strict (LATAM location only)</option>
+                <option value="moderate" selected>⚖️ Moderate (LATAM location OR #latina tag)</option>
+                <option value="broad">🌎 Broad (any #latina tag)</option>
+            </select>
             <button class="debug-toggle" id="debugToggle">🐞 Show debug</button>
             <button class="refresh-btn" id="refreshBtn">⟳ Refresh</button>
         </div>
@@ -105,22 +116,20 @@
         <div class="loading">⏳ Loading streams from Chaturbate API...</div>
     </div>
     <div class="footer">
-        Data provided by Chaturbate public API | Female only · Expanded Latin American detection (countries, cities, region terms)<br>
+        Data provided by Chaturbate public API | Female only · Filter modes control how Latin American content is detected.<br>
         ⚠️ If you see a CORS error, open this page using a local web server (e.g., Python: <code>python -m http.server</code>).
     </div>
 </div>
 
 <script>
     // ---- Latin American detection (expanded) ----
-    // Country codes (ISO)
     const LATAM_CODES = new Set([
         "AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV",
         "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE"
     ]);
 
-    // Keywords: countries (English/Spanish), major cities, regional terms
+    // Expanded keywords: countries (English/Spanish), major cities, regional terms, plus "latina"
     const LOCATION_KEYWORDS = [
-        // Countries
         "argentina", "argentinian", "arg",
         "bolivia", "bolivian",
         "brasil", "brazil", "brazilian",
@@ -152,14 +161,29 @@
         "panamá", "san josé", "san salvador", "guatemala city", "tegucigalpa", "managua",
         "la habana", "santo domingo",
         // Regional terms
-        "latinoamerica", "latinoamérica", "sudamerica", "sudamérica", "south america", "america latina", "latin america"
+        "latinoamerica", "latinoamérica", "sudamerica", "sudamérica", "south america", "america latina", "latin america",
+        "latina"  // add 'latina' so that if a broadcaster puts it in location, it counts
     ];
 
     const locationRegex = new RegExp(`\\b(${LOCATION_KEYWORDS.join('|')})\\b`, 'i');
     const API_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=T2CSW&client_ip=request_ip";
 
-    let includeLatinaByTag = false; // default off
+    let currentMode = "moderate"; // strict, moderate, broad
     let debugLines = [];
+
+    function matchesLocation(room) {
+        // country code check
+        if (room.country && LATAM_CODES.has(room.country)) return true;
+        // location text check
+        const location = (room.location || "").toLowerCase();
+        if (location && locationRegex.test(location)) return true;
+        return false;
+    }
+
+    function hasLatinaTag(room) {
+        const tags = room.tags || [];
+        return tags.some(tag => tag.toLowerCase() === "latina");
+    }
 
     function includeStream(room, debug = false) {
         if (room.gender !== "f") {
@@ -167,33 +191,33 @@
             return false;
         }
 
-        // 1) Country code check
-        if (room.country && LATAM_CODES.has(room.country)) {
-            if (debug) debugLines.push(`✅ ${room.username} – country code ${room.country}`);
-            return true;
-        }
+        let included = false;
+        let reason = "";
 
-        // 2) Location text check
-        const location = (room.location || "").toLowerCase();
-        if (location && locationRegex.test(location)) {
-            if (debug) debugLines.push(`✅ ${room.username} – location "${room.location}" matched keyword`);
-            return true;
-        }
-
-        // 3) Optional #latina tag check (if enabled)
-        if (includeLatinaByTag) {
-            const tags = room.tags || [];
-            if (tags.some(tag => tag.toLowerCase() === "latina")) {
-                if (debug) debugLines.push(`✅ ${room.username} – #latina tag (fallback)`);
-                return true;
+        if (currentMode === "strict") {
+            included = matchesLocation(room);
+            if (!included && debug) reason = `no LATAM location match (country=${room.country || 'none'}, location="${room.location || ''}")`;
+        } 
+        else if (currentMode === "moderate") {
+            included = matchesLocation(room) || hasLatinaTag(room);
+            if (!included && debug) reason = `no LATAM location AND no #latina tag`;
+            else if (included && debug) {
+                if (matchesLocation(room)) reason = `matched location (country=${room.country || 'none'}, location="${room.location || ''}")`;
+                else if (hasLatinaTag(room)) reason = `has #latina tag`;
             }
+        }
+        else if (currentMode === "broad") {
+            included = hasLatinaTag(room);  // any #latina tag, regardless of location
+            if (!included && debug) reason = `no #latina tag`;
+            else if (included && debug) reason = `has #latina tag (broad mode)`;
         }
 
         if (debug) {
-            let reason = `❌ ${room.username} – no LATAM match (country=${room.country || 'none'}, location="${room.location || ''}", tags=${(room.tags || []).join(',')})`;
-            debugLines.push(reason);
+            if (included) debugLines.push(`✅ ${room.username} – ${reason}`);
+            else debugLines.push(`❌ ${room.username} – ${reason || 'filtered out'}`);
         }
-        return false;
+
+        return included;
     }
 
     async function fetchStreams() {
@@ -202,7 +226,7 @@
         const debugPanel = document.getElementById("debugPanel");
         container.innerHTML = '<div class="loading">📡 Fetching live rooms...</div>';
         countSpan.textContent = '— streams found';
-        debugLines = []; // reset
+        debugLines = [];
 
         try {
             const response = await fetch(API_URL);
@@ -219,13 +243,14 @@
             countSpan.textContent = `${top20.length} stream${top20.length !== 1 ? 's' : ''} found`;
             if (debugPanel.classList.contains('visible')) {
                 debugPanel.innerHTML = `<div class="debug-line">📊 Total rooms in API: ${data.results.length}</div>
+                                         <div class="debug-line">🎯 Mode: ${currentMode}</div>
                                          <div class="debug-line">✅ Included: ${filtered.length}</div>
                                          <div class="debug-line">🔝 Showing top ${top20.length}</div>
                                          ${debugLines.map(line => `<div class="debug-line ${line.includes('✅') ? 'debug-included' : 'debug-excluded'}">${escapeHtml(line)}</div>`).join('')}`;
             }
 
             if (top20.length === 0) {
-                container.innerHTML = '<div class="empty">✨ No active female streams detected from Latin America right now. Try again later or enable "#latina tag fallback".</div>';
+                container.innerHTML = '<div class="empty">✨ No active female streams detected from Latin America right now. Try changing the filter mode or try again later.</div>';
                 return;
             }
 
@@ -297,8 +322,8 @@
 
     // Event listeners
     document.getElementById("refreshBtn").addEventListener("click", () => fetchStreams());
-    document.getElementById("includeLatinaTag").addEventListener("change", (e) => {
-        includeLatinaByTag = e.target.checked;
+    document.getElementById("modeSelect").addEventListener("change", (e) => {
+        currentMode = e.target.value;
         fetchStreams();
     });
     const debugToggle = document.getElementById("debugToggle");
