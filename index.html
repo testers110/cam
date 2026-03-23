@@ -16,11 +16,16 @@
   <meta property="og:type" content="website">
 
   <style>
+    :root {
+      --pink: #ff3366;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       background: #0f0f0f;
       color: #fff;
+      line-height: 1.4;
     }
 
     header {
@@ -32,100 +37,197 @@
 
     h1 {
       margin: 0;
-      font-size: 24px;
+      font-size: 28px;
+      font-weight: bold;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 15px;
-      padding: 15px;
+      gap: 20px;
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .card {
       background: #1a1a1a;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-      transition: transform 0.2s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .card:hover {
-      transform: scale(1.02);
+      transform: scale(1.04);
+      box-shadow: 0 8px 25px rgba(255, 51, 102, 0.3);
     }
 
-    iframe {
+    .stream-container {
+      position: relative;
       width: 100%;
-      height: 200px;
-      border: none;
+      height: 210px;
+      background: #000;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .live-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--pink);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 1px;
     }
 
     .info {
-      padding: 10px;
+      padding: 14px;
     }
 
     .username {
       font-weight: bold;
-      font-size: 14px;
+      font-size: 16px;
+      margin-bottom: 4px;
     }
 
     .viewers {
-      font-size: 12px;
-      color: #aaa;
+      font-size: 13px;
+      color: #888;
     }
 
     .load-more {
       text-align: center;
-      padding: 20px;
+      padding: 30px 20px;
     }
 
     button {
-      padding: 10px 20px;
-      background: #ff3366;
+      padding: 14px 32px;
+      background: var(--pink);
+      color: white;
       border: none;
-      color: #fff;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
       cursor: pointer;
-      border-radius: 5px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #ff1a4d;
+    }
+
+    .message {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 40px 20px;
+      color: #aaa;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>🔥 Live Models Online Now</h1>
+  <h1>Live Models Online Now</h1>
 </header>
 
 <main>
   <div class="grid" id="grid"></div>
+  
   <div class="load-more">
-    <button onclick="loadMore()">Load More</button>
+    <button onclick="loadMore()">Load More Models</button>
   </div>
 </main>
 
 <script>
+  // ==================== CONFIG ====================
+  // Replace this with your REAL API when you have one:
   const API_URL = "https://feed..com/api/v1/browse/online_embed?id=bewse2&cmp=CMP_HERE";
+  
+  // Demo data (used if API fails or returns nothing)
+  const demoRooms = [
+    { username: "EmmaWild", viewers: 2341, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "SophieX", viewers: 1876, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "LunaHot", viewers: 3420, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "MiaLive", viewers: 987, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "AvaTease", viewers: 4567, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "LilyRose", viewers: 1234, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "ZaraFire", viewers: 2890, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "NovaSpark", viewers: 765, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "IsabellaX", viewers: 3124, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "RubyVibe", viewers: 1987, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "ScarletX", viewers: 4321, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "VioletDream", viewers: 1543, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "HazelGlow", viewers: 2765, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "AmberLust", viewers: 3210, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "DakotaX", viewers: 890, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "RavenTease", viewers: 5678, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "SkyeWild", viewers: 2345, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "PhoenixX", viewers: 1098, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "BlazeHoney", viewers: 3987, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" },
+    { username: "CrystalVixen", viewers: 2765, stream: "https://test-streams.mux.dev/x264_720p_1500kbs.mp4" }
+  ];
 
   let rooms = [];
   let index = 0;
   const batchSize = 12;
 
+  // ==================== CORE FUNCTIONS ====================
   async function fetchRooms() {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = '<div class="message">Loading live models<span style="color:#ff3366;">...</span></div>';
+
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(API_URL, { mode: "cors" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const data = await res.json();
       rooms = data.results || data.rooms || [];
-      renderRooms();
+
+      if (rooms.length === 0) {
+        throw new Error("No models returned");
+      }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.warn("API failed (normal for demo) → using sample data", err);
+      rooms = demoRooms;
     }
+
+    index = 0;
+    grid.innerHTML = "";
+    renderRooms();
   }
 
   function createCard(room) {
     const div = document.createElement("div");
     div.className = "card";
 
-    const iframe = document.createElement("iframe");
-    iframe.src = room.embed || room.iframe || "";
+    const streamDiv = document.createElement("div");
+    streamDiv.className = "stream-container";
+
+    const video = document.createElement("video");
+    video.src = room.stream || room.embed || "https://test-streams.mux.dev/x264_720p_1500kbs.mp4";
+    video.autoplay = true;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.controls = false;
+
+    const badge = document.createElement("div");
+    badge.className = "live-badge";
+    badge.textContent = "LIVE";
+
+    streamDiv.appendChild(video);
+    streamDiv.appendChild(badge);
 
     const info = document.createElement("div");
     info.className = "info";
@@ -136,12 +238,12 @@
 
     const viewers = document.createElement("div");
     viewers.className = "viewers";
-    viewers.textContent = (room.num_users || 0) + " viewers";
+    viewers.textContent = `${room.viewers || room.num_users || 0} viewers online`;
 
     info.appendChild(username);
     info.appendChild(viewers);
 
-    div.appendChild(iframe);
+    div.appendChild(streamDiv);
     div.appendChild(info);
 
     return div;
@@ -155,13 +257,18 @@
     }
 
     index += batchSize;
+
+    // Hide button when all loaded
+    if (index >= rooms.length) {
+      document.querySelector(".load-more").style.display = "none";
+    }
   }
 
   function loadMore() {
     renderRooms();
   }
 
-  // Initial load
+  // ==================== START ====================
   fetchRooms();
 </script>
 
