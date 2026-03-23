@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Live Streams | Latin America | Female Only | Chaturbate</title>
+    <title>Live Cams | Latin America | Female Only | Chaturbate</title>
     <style>
         * {
             margin: 0;
@@ -74,7 +74,7 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 24px;
         }
 
@@ -93,58 +93,32 @@
             border-color: #4a4e6b;
         }
 
-        .thumbnail {
+        /* Iframe embed styling */
+        .embed-container {
             position: relative;
             background: #000;
             aspect-ratio: 16 / 9;
             overflow: hidden;
         }
 
-        .thumbnail img {
+        .embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+            border: none;
         }
 
-        .card:hover .thumbnail img {
-            transform: scale(1.03);
-        }
-
-        .online-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: #22c55e;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .viewers {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
+        /* Info section */
         .info {
-            padding: 16px;
+            padding: 12px 16px;
         }
 
         .username {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -161,58 +135,28 @@
         }
 
         .location {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #9ca3af;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .room-subject {
-            font-size: 0.85rem;
-            background: #1e1f2c;
-            padding: 8px 10px;
-            border-radius: 14px;
-            margin: 12px 0;
-            color: #e2e8f0;
-            line-height: 1.4;
-            word-break: break-word;
         }
 
         .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin: 12px 0;
+            margin-top: 8px;
         }
 
         .tag {
             background: #252736;
-            padding: 4px 10px;
+            padding: 2px 8px;
             border-radius: 30px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #c084fc;
             font-weight: 500;
-        }
-
-        .link-btn {
-            display: inline-block;
-            width: 100%;
-            text-align: center;
-            background: #c084fc;
-            color: #0a0c10;
-            font-weight: 600;
-            padding: 10px 0;
-            border-radius: 40px;
-            text-decoration: none;
-            transition: background 0.2s;
-            margin-top: 8px;
-            font-size: 0.9rem;
-        }
-
-        .link-btn:hover {
-            background: #a855f7;
         }
 
         .loading, .error, .empty {
@@ -250,8 +194,8 @@
 </head>
 <body>
 <div class="container">
-    <h1>🔥 LIVE from Latin America</h1>
-    <div class="subhead">Top 20 active female streams · Real‑time from LATAM region (country code or location text)</div>
+    <h1>🔥 LIVE Cams from Latin America</h1>
+    <div class="subhead">Top 20 active female streams · Embedded players · Real‑time from LATAM</div>
 
     <div class="toolbar">
         <div class="count-badge" id="streamCount">— streams found</div>
@@ -263,7 +207,7 @@
     </div>
     <div class="footer">
         Data provided by Chaturbate public API | Female only · Latin American countries detected via country code or location name<br>
-        ⚠️ If you see a CORS error, open this page using a local web server (e.g., Python: <code>python -m http.server</code>) or use a browser extension that disables CORS temporarily.
+        ⚠️ If you see a CORS error, open this page using a local web server (e.g., Python: <code>python -m http.server</code>).
     </div>
 </div>
 
@@ -274,7 +218,6 @@
         "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE"
     ]);
 
-    // Keywords (lowercase) to match in location string
     const LOCATION_KEYWORDS = [
         "argentina", "argentinian", "arg",
         "bolivia", "bolivian",
@@ -298,28 +241,18 @@
         "venezuela", "venezuelan"
     ];
 
-    // Pre‑compile regex for faster location matching (optional, but good)
     const locationRegex = new RegExp(`\\b(${LOCATION_KEYWORDS.join('|')})\\b`, 'i');
-
     const API_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=T2CSW&client_ip=request_ip";
 
-    // Helper: check if stream should be included
     function includeStream(room) {
         if (room.gender !== "f") return false;
 
         // Country code check
-        const countryCode = room.country;
-        if (countryCode && LATAM_CODES.has(countryCode)) {
-            return true;
-        }
+        if (room.country && LATAM_CODES.has(room.country)) return true;
 
-        // Location string check (case‑insensitive)
+        // Location text check
         const location = (room.location || "").toLowerCase();
-        if (location && locationRegex.test(location)) {
-            return true;
-        }
-
-        return false;
+        return location && locationRegex.test(location);
     }
 
     async function fetchStreams() {
@@ -331,23 +264,15 @@
 
         try {
             const response = await fetch(API_URL);
-            if (!response.ok) {
-                throw new Error(`HTTP error ${response.status} – ${response.statusText}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error ${response.status} – ${response.statusText}`);
 
             const data = await response.json();
+            if (!data.results || !Array.isArray(data.results)) throw new Error("Invalid API response");
 
-            if (!data.results || !Array.isArray(data.results)) {
-                throw new Error("Invalid API response structure");
-            }
-
-            // Filter streams
-            let filtered = data.results.filter(room => includeStream(room));
-
-            // Sort by viewers descending
+            let filtered = data.results.filter(includeStream);
             filtered.sort((a, b) => (b.num_users || 0) - (a.num_users || 0));
-
             const top20 = filtered.slice(0, 20);
+
             countSpan.textContent = `${top20.length} stream${top20.length !== 1 ? 's' : ''} found`;
 
             if (top20.length === 0) {
@@ -356,12 +281,10 @@
             }
 
             renderCards(top20, container);
-
         } catch (err) {
-            console.error("Fetch error:", err);
+            console.error(err);
             let errorMsg = err.message;
-            // Detect CORS error
-            if (err.message.includes('fetch') || err.message.includes('CORS')) {
+            if (errorMsg.includes('fetch') || errorMsg.includes('CORS')) {
                 errorMsg = 'CORS error: The browser blocked the request. Open this file via a local web server (e.g., "python -m http.server") or use a CORS‑unblock extension for testing.';
             }
             container.innerHTML = `<div class="error">❌ Failed to load streams: ${escapeHtml(errorMsg)}</div>`;
@@ -375,15 +298,20 @@
             const card = document.createElement("div");
             card.className = "card";
 
-            const thumbUrl = room.image_url_360x270 || room.image_url || "https://via.placeholder.com/360x270?text=No+Preview";
+            // Get embed code from API (iframe_embed is the standard affiliate embed)
+            let embedHtml = room.iframe_embed || room.iframe_embed_revshare;
+            if (!embedHtml) {
+                // Fallback: show a placeholder if embed is missing (should not happen)
+                embedHtml = `<div style="background:#1e1f2c; height:100%; display:flex; align-items:center; justify-content:center;">Embed not available</div>`;
+            }
+
+            // Prepare info section
             const username = room.username || "anonymous";
             const displayName = (room.display_name || username).substring(0, 40);
             const locationText = room.location || (room.country ? `📍 ${room.country}` : "Unknown location");
-            const subject = (room.room_subject || "").trim() || "✨ No subject set";
             const viewers = room.num_users || 0;
             const tags = room.tags || [];
 
-            // Badges
             let extraBadge = '';
             if (room.is_hd) extraBadge += '<span>HD</span>';
             if (room.is_new) extraBadge += '<span>NEW</span>';
@@ -392,13 +320,9 @@
                 ? `<div class="tags">${tags.slice(0, 6).map(tag => `<span class="tag">#${escapeHtml(tag)}</span>`).join('')}</div>`
                 : '';
 
-            const roomUrl = room.chat_room_url_revshare || room.chat_room_url || "#";
-
             card.innerHTML = `
-                <div class="thumbnail">
-                    <img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(username)}" loading="lazy" onerror="this.src='https://via.placeholder.com/360x270?text=Image+Unavailable'">
-                    <div class="online-badge">🔴 LIVE</div>
-                    <div class="viewers">👥 ${viewers.toLocaleString()}</div>
+                <div class="embed-container">
+                    ${embedHtml}
                 </div>
                 <div class="info">
                     <div class="username">
@@ -406,9 +330,10 @@
                         ${extraBadge ? `<span>${extraBadge}</span>` : ''}
                     </div>
                     <div class="location">📍 ${escapeHtml(locationText)}</div>
-                    <div class="room-subject">💬 ${escapeHtml(subject)}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75rem; color: #22c55e;">👥 ${viewers.toLocaleString()}</span>
+                    </div>
                     ${tagsHtml}
-                    <a href="${escapeHtml(roomUrl)}" target="_blank" rel="noopener noreferrer" class="link-btn">🎬 Enter Room</a>
                 </div>
             `;
 
@@ -432,9 +357,7 @@
     fetchStreams();
 
     // Refresh button
-    document.getElementById("refreshBtn").addEventListener("click", () => {
-        fetchStreams();
-    });
+    document.getElementById("refreshBtn").addEventListener("click", () => fetchStreams());
 </script>
 </body>
 </html>
