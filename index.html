@@ -5,24 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Live Cams | Latin America | Female Only | Chaturbate</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0c10;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #eef2ff;
             padding: 20px;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1400px; margin: 0 auto; }
         h1 {
             font-size: 2rem;
             font-weight: 600;
@@ -32,14 +22,7 @@
             background-clip: text;
             color: transparent;
         }
-
-        .subhead {
-            color: #9ca3af;
-            margin-bottom: 1.5rem;
-            border-left: 3px solid #c084fc;
-            padding-left: 1rem;
-        }
-
+        .subhead { color: #9ca3af; margin-bottom: 1.5rem; border-left: 3px solid #c084fc; padding-left: 1rem; }
         .toolbar {
             display: flex;
             justify-content: space-between;
@@ -48,16 +31,8 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-
-        .count-badge {
-            background: #1e1f2a;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .refresh-btn {
+        .count-badge { background: #1e1f2a; padding: 6px 14px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; }
+        .refresh-btn, .debug-toggle {
             background: #2d2f3e;
             border: none;
             color: #c084fc;
@@ -67,17 +42,9 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
-        .refresh-btn:hover {
-            background: #3d3f52;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-        }
-
+        .refresh-btn:hover, .debug-toggle:hover { background: #3d3f52; }
+        .debug-toggle.active { background: #c084fc; color: #0a0c10; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
         .card {
             background: #14161f;
             border-radius: 20px;
@@ -86,110 +53,34 @@
             border: 1px solid #2a2c3a;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.6);
-            border-color: #4a4e6b;
-        }
-
-        /* Iframe embed styling */
-        .embed-container {
-            position: relative;
-            background: #000;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
-        }
-
-        .embed-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Info section */
-        .info {
-            padding: 12px 16px;
-        }
-
-        .username {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .username span {
-            background: #2d2f3e;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-weight: normal;
-            color: #cbd5e6;
-        }
-
-        .location {
-            font-size: 0.75rem;
-            color: #9ca3af;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
-        .tag {
-            background: #252736;
-            padding: 2px 8px;
-            border-radius: 30px;
-            font-size: 0.65rem;
-            color: #c084fc;
-            font-weight: 500;
-        }
-
-        .loading, .error, .empty {
-            text-align: center;
-            padding: 60px 20px;
-            font-size: 1.2rem;
-            color: #9ca3af;
-        }
-
-        .error {
-            background: #2c1a1f;
-            border-left: 4px solid #f87171;
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -12px rgba(0,0,0,0.6); border-color: #4a4e6b; }
+        .embed-container { position: relative; background: #000; aspect-ratio: 16 / 9; overflow: hidden; }
+        .embed-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .info { padding: 12px 16px; }
+        .username { font-size: 1rem; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .username span { background: #2d2f3e; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; font-weight: normal; color: #cbd5e6; }
+        .location { font-size: 0.75rem; color: #9ca3af; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .tag { background: #252736; padding: 2px 8px; border-radius: 30px; font-size: 0.65rem; color: #c084fc; font-weight: 500; }
+        .loading, .error, .empty { text-align: center; padding: 60px 20px; font-size: 1.2rem; color: #9ca3af; }
+        .error { background: #2c1a1f; border-left: 4px solid #f87171; border-radius: 16px; color: #fecaca; }
+        .footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #4b5563; border-top: 1px solid #252836; padding-top: 24px; }
+        .debug-panel {
+            background: #1a1c24;
             border-radius: 16px;
-            color: #fecaca;
-        }
-
-        .footer {
-            margin-top: 40px;
-            text-align: center;
+            margin-bottom: 24px;
+            padding: 12px;
             font-size: 0.75rem;
-            color: #4b5563;
-            border-top: 1px solid #252836;
-            padding-top: 24px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
         }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 12px;
-            }
-            .grid {
-                gap: 16px;
-            }
-        }
+        .debug-panel.visible { display: block; }
+        .debug-line { border-bottom: 1px solid #2a2c3a; padding: 6px; color: #b0b3c0; }
+        .debug-included { color: #4ade80; }
+        .debug-excluded { color: #f87171; }
+        @media (max-width: 640px) { body { padding: 12px; } .grid { gap: 16px; } }
     </style>
 </head>
 <body>
@@ -199,26 +90,37 @@
 
     <div class="toolbar">
         <div class="count-badge" id="streamCount">— streams found</div>
-        <button class="refresh-btn" id="refreshBtn">⟳ Refresh</button>
+        <div>
+            <label style="margin-right: 16px; font-size: 0.8rem;">
+                <input type="checkbox" id="includeLatinaTag"> Include #latina tag (may show non‑LATAM)
+            </label>
+            <button class="debug-toggle" id="debugToggle">🐞 Show debug</button>
+            <button class="refresh-btn" id="refreshBtn">⟳ Refresh</button>
+        </div>
     </div>
+
+    <div id="debugPanel" class="debug-panel"></div>
 
     <div id="streams-container" class="grid">
         <div class="loading">⏳ Loading streams from Chaturbate API...</div>
     </div>
     <div class="footer">
-        Data provided by Chaturbate public API | Female only · Latin American countries detected via country code or location name<br>
+        Data provided by Chaturbate public API | Female only · Expanded Latin American detection (countries, cities, region terms)<br>
         ⚠️ If you see a CORS error, open this page using a local web server (e.g., Python: <code>python -m http.server</code>).
     </div>
 </div>
 
 <script>
-    // ---- LATAM detection ----
+    // ---- Latin American detection (expanded) ----
+    // Country codes (ISO)
     const LATAM_CODES = new Set([
         "AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV",
         "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE"
     ]);
 
+    // Keywords: countries (English/Spanish), major cities, regional terms
     const LOCATION_KEYWORDS = [
+        // Countries
         "argentina", "argentinian", "arg",
         "bolivia", "bolivian",
         "brasil", "brazil", "brazilian",
@@ -231,36 +133,76 @@
         "el salvador", "salvadoran",
         "guatemala", "guatemalan",
         "honduras", "honduran",
-        "mexico", "mexican",
+        "mexico", "mexican", "méxico",
         "nicaragua", "nicaraguan",
         "panama", "panamanian",
         "paraguay", "paraguayan",
         "peru", "peruvian",
         "puerto rico", "puerto rican",
         "uruguay", "uruguayan",
-        "venezuela", "venezuelan"
+        "venezuela", "venezuelan",
+        // Spanish names
+        "colombie", "mexique", "brésil", "argentine", "chili", "pérou", "equateur",
+        // Major cities
+        "bogotá", "medellín", "cali", "barranquilla",
+        "são paulo", "rio de janeiro", "brasília", "salvador",
+        "buenos aires", "córdoba", "rosario",
+        "ciudad de méxico", "guadalajara", "monterrey",
+        "lima", "santiago", "caracas", "montevideo", "asunción", "quito", "guayaquil",
+        "panamá", "san josé", "san salvador", "guatemala city", "tegucigalpa", "managua",
+        "la habana", "santo domingo",
+        // Regional terms
+        "latinoamerica", "latinoamérica", "sudamerica", "sudamérica", "south america", "america latina", "latin america"
     ];
 
     const locationRegex = new RegExp(`\\b(${LOCATION_KEYWORDS.join('|')})\\b`, 'i');
     const API_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=T2CSW&client_ip=request_ip";
 
-    function includeStream(room) {
-        if (room.gender !== "f") return false;
+    let includeLatinaByTag = false; // default off
+    let debugLines = [];
 
-        // Country code check
-        if (room.country && LATAM_CODES.has(room.country)) return true;
+    function includeStream(room, debug = false) {
+        if (room.gender !== "f") {
+            if (debug) debugLines.push(`❌ ${room.username} – gender ${room.gender} (not female)`);
+            return false;
+        }
 
-        // Location text check
+        // 1) Country code check
+        if (room.country && LATAM_CODES.has(room.country)) {
+            if (debug) debugLines.push(`✅ ${room.username} – country code ${room.country}`);
+            return true;
+        }
+
+        // 2) Location text check
         const location = (room.location || "").toLowerCase();
-        return location && locationRegex.test(location);
+        if (location && locationRegex.test(location)) {
+            if (debug) debugLines.push(`✅ ${room.username} – location "${room.location}" matched keyword`);
+            return true;
+        }
+
+        // 3) Optional #latina tag check (if enabled)
+        if (includeLatinaByTag) {
+            const tags = room.tags || [];
+            if (tags.some(tag => tag.toLowerCase() === "latina")) {
+                if (debug) debugLines.push(`✅ ${room.username} – #latina tag (fallback)`);
+                return true;
+            }
+        }
+
+        if (debug) {
+            let reason = `❌ ${room.username} – no LATAM match (country=${room.country || 'none'}, location="${room.location || ''}", tags=${(room.tags || []).join(',')})`;
+            debugLines.push(reason);
+        }
+        return false;
     }
 
     async function fetchStreams() {
         const container = document.getElementById("streams-container");
         const countSpan = document.getElementById("streamCount");
-
+        const debugPanel = document.getElementById("debugPanel");
         container.innerHTML = '<div class="loading">📡 Fetching live rooms...</div>';
         countSpan.textContent = '— streams found';
+        debugLines = []; // reset
 
         try {
             const response = await fetch(API_URL);
@@ -269,14 +211,21 @@
             const data = await response.json();
             if (!data.results || !Array.isArray(data.results)) throw new Error("Invalid API response");
 
-            let filtered = data.results.filter(includeStream);
+            // Run includeStream with debug = true to collect reasons
+            let filtered = data.results.filter(room => includeStream(room, true));
             filtered.sort((a, b) => (b.num_users || 0) - (a.num_users || 0));
             const top20 = filtered.slice(0, 20);
 
             countSpan.textContent = `${top20.length} stream${top20.length !== 1 ? 's' : ''} found`;
+            if (debugPanel.classList.contains('visible')) {
+                debugPanel.innerHTML = `<div class="debug-line">📊 Total rooms in API: ${data.results.length}</div>
+                                         <div class="debug-line">✅ Included: ${filtered.length}</div>
+                                         <div class="debug-line">🔝 Showing top ${top20.length}</div>
+                                         ${debugLines.map(line => `<div class="debug-line ${line.includes('✅') ? 'debug-included' : 'debug-excluded'}">${escapeHtml(line)}</div>`).join('')}`;
+            }
 
             if (top20.length === 0) {
-                container.innerHTML = '<div class="empty">✨ No active female streams detected from Latin America right now. Try again later!</div>';
+                container.innerHTML = '<div class="empty">✨ No active female streams detected from Latin America right now. Try again later or enable "#latina tag fallback".</div>';
                 return;
             }
 
@@ -293,19 +242,15 @@
 
     function renderCards(rooms, container) {
         container.innerHTML = "";
-
         rooms.forEach(room => {
             const card = document.createElement("div");
             card.className = "card";
 
-            // Get embed code from API (iframe_embed is the standard affiliate embed)
             let embedHtml = room.iframe_embed || room.iframe_embed_revshare;
             if (!embedHtml) {
-                // Fallback: show a placeholder if embed is missing (should not happen)
                 embedHtml = `<div style="background:#1e1f2c; height:100%; display:flex; align-items:center; justify-content:center;">Embed not available</div>`;
             }
 
-            // Prepare info section
             const username = room.username || "anonymous";
             const displayName = (room.display_name || username).substring(0, 40);
             const locationText = room.location || (room.country ? `📍 ${room.country}` : "Unknown location");
@@ -336,7 +281,6 @@
                     ${tagsHtml}
                 </div>
             `;
-
             container.appendChild(card);
         });
     }
@@ -348,16 +292,25 @@
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
             return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c; // preserve emojis
         });
     }
 
+    // Event listeners
+    document.getElementById("refreshBtn").addEventListener("click", () => fetchStreams());
+    document.getElementById("includeLatinaTag").addEventListener("change", (e) => {
+        includeLatinaByTag = e.target.checked;
+        fetchStreams();
+    });
+    const debugToggle = document.getElementById("debugToggle");
+    const debugPanel = document.getElementById("debugPanel");
+    debugToggle.addEventListener("click", () => {
+        debugPanel.classList.toggle("visible");
+        debugToggle.classList.toggle("active");
+        if (debugPanel.classList.contains("visible")) fetchStreams(); // refresh to fill debug panel
+    });
+
     // Initial load
     fetchStreams();
-
-    // Refresh button
-    document.getElementById("refreshBtn").addEventListener("click", () => fetchStreams());
 </script>
 </body>
 </html>
