@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Live Streams | Latin America | Female Only | Chaturbate</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0c10;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #eef2ff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #f0f2ff 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subhead {
+            color: #9ca3af;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #c084fc;
+            padding-left: 1rem;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .count-badge {
+            background: #1e1f2a;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .refresh-btn {
+            background: #2d2f3e;
+            border: none;
+            color: #c084fc;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #3d3f52;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: #14161f;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #2a2c3a;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.6);
+            border-color: #4a4e6b;
+        }
+
+        .thumbnail {
+            position: relative;
+            background: #000;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .card:hover .thumbnail img {
+            transform: scale(1.03);
+        }
+
+        .online-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #22c55e;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .viewers {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .info {
+            padding: 16px;
+        }
+
+        .username {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .username span {
+            background: #2d2f3e;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: normal;
+            color: #cbd5e6;
+        }
+
+        .location {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .room-subject {
+            font-size: 0.85rem;
+            background: #1e1f2c;
+            padding: 8px 10px;
+            border-radius: 14px;
+            margin: 12px 0;
+            color: #e2e8f0;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 0;
+        }
+
+        .tag {
+            background: #252736;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #c084fc;
+            font-weight: 500;
+        }
+
+        .link-btn {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            background: #c084fc;
+            color: #0a0c10;
+            font-weight: 600;
+            padding: 10px 0;
+            border-radius: 40px;
+            text-decoration: none;
+            transition: background 0.2s;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover {
+            background: #a855f7;
+        }
+
+        .loading, .error, .empty {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #9ca3af;
+        }
+
+        .error {
+            background: #2c1a1f;
+            border-left: 4px solid #f87171;
+            border-radius: 16px;
+            color: #fecaca;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4b5563;
+            border-top: 1px solid #252836;
+            padding-top: 24px;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+            }
+            .grid {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔥 LIVE from Latin America</h1>
+    <div class="subhead">Top 20 active female streams · Real‑time from LATAM region (country code or location text)</div>
+
+    <div class="toolbar">
+        <div class="count-badge" id="streamCount">— streams found</div>
+        <button class="refresh-btn" id="refreshBtn">⟳ Refresh</button>
+    </div>
+
+    <div id="streams-container" class="grid">
+        <div class="loading">⏳ Loading streams from Chaturbate API...</div>
+    </div>
+    <div class="footer">
+        Data provided by Chaturbate public API | Female only · Latin American countries detected via country code or location name<br>
+        ⚠️ If you see a CORS error, open this page using a local web server (e.g., Python: <code>python -m http.server</code>) or use a browser extension that disables CORS temporarily.
+    </div>
+</div>
+
+<script>
+    // ---- LATAM detection ----
+    const LATAM_CODES = new Set([
+        "AR", "BO", "BR", "CL", "CO", "CR", "CU", "DO", "EC", "SV",
+        "GT", "HN", "MX", "NI", "PA", "PY", "PE", "PR", "UY", "VE"
+    ]);
+
+    // Keywords (lowercase) to match in location string
+    const LOCATION_KEYWORDS = [
+        "argentina", "argentinian", "arg",
+        "bolivia", "bolivian",
+        "brasil", "brazil", "brazilian",
+        "chile", "chilean",
+        "colombia", "colombian",
+        "costa rica", "costarrican",
+        "cuba", "cuban",
+        "dominican republic", "dominican",
+        "ecuador", "ecuadorian",
+        "el salvador", "salvadoran",
+        "guatemala", "guatemalan",
+        "honduras", "honduran",
+        "mexico", "mexican",
+        "nicaragua", "nicaraguan",
+        "panama", "panamanian",
+        "paraguay", "paraguayan",
+        "peru", "peruvian",
+        "puerto rico", "puerto rican",
+        "uruguay", "uruguayan",
+        "venezuela", "venezuelan"
+    ];
+
+    // Pre‑compile regex for faster location matching (optional, but good)
+    const locationRegex = new RegExp(`\\b(${LOCATION_KEYWORDS.join('|')})\\b`, 'i');
+
+    const API_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=T2CSW&client_ip=request_ip";
+
+    // Helper: check if stream should be included
+    function includeStream(room) {
+        if (room.gender !== "f") return false;
+
+        // Country code check
+        const countryCode = room.country;
+        if (countryCode && LATAM_CODES.has(countryCode)) {
+            return true;
+        }
+
+        // Location string check (case‑insensitive)
+        const location = (room.location || "").toLowerCase();
+        if (location && locationRegex.test(location)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    async function fetchStreams() {
+        const container = document.getElementById("streams-container");
+        const countSpan = document.getElementById("streamCount");
+
+        container.innerHTML = '<div class="loading">📡 Fetching live rooms...</div>';
+        countSpan.textContent = '— streams found';
+
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status} – ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.results || !Array.isArray(data.results)) {
+                throw new Error("Invalid API response structure");
+            }
+
+            // Filter streams
+            let filtered = data.results.filter(room => includeStream(room));
+
+            // Sort by viewers descending
+            filtered.sort((a, b) => (b.num_users || 0) - (a.num_users || 0));
+
+            const top20 = filtered.slice(0, 20);
+            countSpan.textContent = `${top20.length} stream${top20.length !== 1 ? 's' : ''} found`;
+
+            if (top20.length === 0) {
+                container.innerHTML = '<div class="empty">✨ No active female streams detected from Latin America right now. Try again later!</div>';
+                return;
+            }
+
+            renderCards(top20, container);
+
+        } catch (err) {
+            console.error("Fetch error:", err);
+            let errorMsg = err.message;
+            // Detect CORS error
+            if (err.message.includes('fetch') || err.message.includes('CORS')) {
+                errorMsg = 'CORS error: The browser blocked the request. Open this file via a local web server (e.g., "python -m http.server") or use a CORS‑unblock extension for testing.';
+            }
+            container.innerHTML = `<div class="error">❌ Failed to load streams: ${escapeHtml(errorMsg)}</div>`;
+        }
+    }
+
+    function renderCards(rooms, container) {
+        container.innerHTML = "";
+
+        rooms.forEach(room => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const thumbUrl = room.image_url_360x270 || room.image_url || "https://via.placeholder.com/360x270?text=No+Preview";
+            const username = room.username || "anonymous";
+            const displayName = (room.display_name || username).substring(0, 40);
+            const locationText = room.location || (room.country ? `📍 ${room.country}` : "Unknown location");
+            const subject = (room.room_subject || "").trim() || "✨ No subject set";
+            const viewers = room.num_users || 0;
+            const tags = room.tags || [];
+
+            // Badges
+            let extraBadge = '';
+            if (room.is_hd) extraBadge += '<span>HD</span>';
+            if (room.is_new) extraBadge += '<span>NEW</span>';
+
+            const tagsHtml = tags.length
+                ? `<div class="tags">${tags.slice(0, 6).map(tag => `<span class="tag">#${escapeHtml(tag)}</span>`).join('')}</div>`
+                : '';
+
+            const roomUrl = room.chat_room_url_revshare || room.chat_room_url || "#";
+
+            card.innerHTML = `
+                <div class="thumbnail">
+                    <img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(username)}" loading="lazy" onerror="this.src='https://via.placeholder.com/360x270?text=Image+Unavailable'">
+                    <div class="online-badge">🔴 LIVE</div>
+                    <div class="viewers">👥 ${viewers.toLocaleString()}</div>
+                </div>
+                <div class="info">
+                    <div class="username">
+                        ${escapeHtml(displayName)}
+                        ${extraBadge ? `<span>${extraBadge}</span>` : ''}
+                    </div>
+                    <div class="location">📍 ${escapeHtml(locationText)}</div>
+                    <div class="room-subject">💬 ${escapeHtml(subject)}</div>
+                    ${tagsHtml}
+                    <a href="${escapeHtml(roomUrl)}" target="_blank" rel="noopener noreferrer" class="link-btn">🎬 Enter Room</a>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c; // preserve emojis
+        });
+    }
+
+    // Initial load
+    fetchStreams();
+
+    // Refresh button
+    document.getElementById("refreshBtn").addEventListener("click", () => {
+        fetchStreams();
+    });
+</script>
+</body>
+</html>
