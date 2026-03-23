@@ -41,7 +41,7 @@
             font-size: 0.85rem;
             cursor: pointer;
         }
-        .refresh-btn, .debug-toggle {
+        .refresh-btn {
             background: #2d2f3e;
             border: none;
             color: #c084fc;
@@ -51,8 +51,7 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-        .refresh-btn:hover, .debug-toggle:hover { background: #3d3f52; }
-        .debug-toggle.active { background: #c084fc; color: #0a0c10; }
+        .refresh-btn:hover { background: #3d3f52; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
         .card {
             background: #14161f;
@@ -74,21 +73,6 @@
         .loading, .error, .empty { text-align: center; padding: 60px 20px; font-size: 1.2rem; color: #9ca3af; }
         .error { background: #2c1a1f; border-left: 4px solid #f87171; border-radius: 16px; color: #fecaca; }
         .footer { margin-top: 40px; text-align: center; font-size: 0.75rem; color: #4b5563; border-top: 1px solid #252836; padding-top: 24px; }
-        .debug-panel {
-            background: #1a1c24;
-            border-radius: 16px;
-            margin-bottom: 24px;
-            padding: 12px;
-            font-size: 0.75rem;
-            font-family: monospace;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-        }
-        .debug-panel.visible { display: block; }
-        .debug-line { border-bottom: 1px solid #2a2c3a; padding: 6px; color: #b0b3c0; }
-        .debug-included { color: #4ade80; }
-        .debug-excluded { color: #f87171; }
         @media (max-width: 640px) { body { padding: 12px; } .grid { gap: 16px; } }
     </style>
 </head>
@@ -105,12 +89,9 @@
                 <option value="moderate" selected>⚖️ Moderate (LATAM location OR #latina tag)</option>
                 <option value="broad">🌎 Broad (any #latina tag)</option>
             </select>
-            <button class="debug-toggle" id="debugToggle">🐞 Show debug</button>
             <button class="refresh-btn" id="refreshBtn">⟳ Refresh</button>
         </div>
     </div>
-
-    <div id="debugPanel" class="debug-panel"></div>
 
     <div id="streams-container" class="grid">
         <div class="loading">⏳ Loading streams from Chaturbate API...</div>
@@ -162,19 +143,16 @@
         "la habana", "santo domingo",
         // Regional terms
         "latinoamerica", "latinoamérica", "sudamerica", "sudamérica", "south america", "america latina", "latin america",
-        "latina"  // add 'latina' so that if a broadcaster puts it in location, it counts
+        "latina"
     ];
 
     const locationRegex = new RegExp(`\\b(${LOCATION_KEYWORDS.join('|')})\\b`, 'i');
     const API_URL = "https://chaturbate.com/api/public/affiliates/onlinerooms/?wm=T2CSW&client_ip=request_ip";
 
-    let currentMode = "moderate"; // strict, moderate, broad
-    let debugLines = [];
+    let currentMode = "moderate";
 
     function matchesLocation(room) {
-        // country code check
         if (room.country && LATAM_CODES.has(room.country)) return true;
-        // location text check
         const location = (room.location || "").toLowerCase();
         if (location && locationRegex.test(location)) return true;
         return false;
@@ -185,48 +163,23 @@
         return tags.some(tag => tag.toLowerCase() === "latina");
     }
 
-    function includeStream(room, debug = false) {
-        if (room.gender !== "f") {
-            if (debug) debugLines.push(`❌ ${room.username} – gender ${room.gender} (not female)`);
-            return false;
-        }
-
-        let included = false;
-        let reason = "";
+    function includeStream(room) {
+        if (room.gender !== "f") return false;
 
         if (currentMode === "strict") {
-            included = matchesLocation(room);
-            if (!included && debug) reason = `no LATAM location match (country=${room.country || 'none'}, location="${room.location || ''}")`;
-        } 
-        else if (currentMode === "moderate") {
-            included = matchesLocation(room) || hasLatinaTag(room);
-            if (!included && debug) reason = `no LATAM location AND no #latina tag`;
-            else if (included && debug) {
-                if (matchesLocation(room)) reason = `matched location (country=${room.country || 'none'}, location="${room.location || ''}")`;
-                else if (hasLatinaTag(room)) reason = `has #latina tag`;
-            }
+            return matchesLocation(room);
+        } else if (currentMode === "moderate") {
+            return matchesLocation(room) || hasLatinaTag(room);
+        } else { // broad
+            return hasLatinaTag(room);
         }
-        else if (currentMode === "broad") {
-            included = hasLatinaTag(room);  // any #latina tag, regardless of location
-            if (!included && debug) reason = `no #latina tag`;
-            else if (included && debug) reason = `has #latina tag (broad mode)`;
-        }
-
-        if (debug) {
-            if (included) debugLines.push(`✅ ${room.username} – ${reason}`);
-            else debugLines.push(`❌ ${room.username} – ${reason || 'filtered out'}`);
-        }
-
-        return included;
     }
 
     async function fetchStreams() {
         const container = document.getElementById("streams-container");
         const countSpan = document.getElementById("streamCount");
-        const debugPanel = document.getElementById("debugPanel");
         container.innerHTML = '<div class="loading">📡 Fetching live rooms...</div>';
         countSpan.textContent = '— streams found';
-        debugLines = [];
 
         try {
             const response = await fetch(API_URL);
@@ -235,19 +188,11 @@
             const data = await response.json();
             if (!data.results || !Array.isArray(data.results)) throw new Error("Invalid API response");
 
-            // Run includeStream with debug = true to collect reasons
-            let filtered = data.results.filter(room => includeStream(room, true));
+            let filtered = data.results.filter(room => includeStream(room));
             filtered.sort((a, b) => (b.num_users || 0) - (a.num_users || 0));
             const top20 = filtered.slice(0, 20);
 
             countSpan.textContent = `${top20.length} stream${top20.length !== 1 ? 's' : ''} found`;
-            if (debugPanel.classList.contains('visible')) {
-                debugPanel.innerHTML = `<div class="debug-line">📊 Total rooms in API: ${data.results.length}</div>
-                                         <div class="debug-line">🎯 Mode: ${currentMode}</div>
-                                         <div class="debug-line">✅ Included: ${filtered.length}</div>
-                                         <div class="debug-line">🔝 Showing top ${top20.length}</div>
-                                         ${debugLines.map(line => `<div class="debug-line ${line.includes('✅') ? 'debug-included' : 'debug-excluded'}">${escapeHtml(line)}</div>`).join('')}`;
-            }
 
             if (top20.length === 0) {
                 container.innerHTML = '<div class="empty">✨ No active female streams detected from Latin America right now. Try changing the filter mode or try again later.</div>';
@@ -320,21 +265,12 @@
         });
     }
 
-    // Event listeners
     document.getElementById("refreshBtn").addEventListener("click", () => fetchStreams());
     document.getElementById("modeSelect").addEventListener("change", (e) => {
         currentMode = e.target.value;
         fetchStreams();
     });
-    const debugToggle = document.getElementById("debugToggle");
-    const debugPanel = document.getElementById("debugPanel");
-    debugToggle.addEventListener("click", () => {
-        debugPanel.classList.toggle("visible");
-        debugToggle.classList.toggle("active");
-        if (debugPanel.classList.contains("visible")) fetchStreams(); // refresh to fill debug panel
-    });
 
-    // Initial load
     fetchStreams();
 </script>
 </body>
